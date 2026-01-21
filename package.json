@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist src/server.ts src/routes/emotion.ts src/emotion/judge.ts src/emotion/_smokeJudge.ts",
     "start": "node dist/server.js",
-    "test:smoke": "node dist/_smokeJudge.js"
+    "test:smoke": "node -r dotenv/config dist/_smokeJudge.js"
   },
   "keywords": [],
   "author": "",
