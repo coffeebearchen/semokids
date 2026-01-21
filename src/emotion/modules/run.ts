@@ -1,25 +1,100 @@
-﻿// PRD 对应：Run 写入（Run 表复用概念）
-// 约束：不接 Prisma 也可以；接口必须 async；不补全字段规则
+import { PrismaClient } from "@prisma/client";
 
-export type RunRecord = {
-  runId: string;           // PRD：运行记录唯一ID（占位）
-  createdAt: string;       // PRD：运行时间（ISO 字符串）
-  gate: "PASS" | "STOP";   // PRD：Gate 结果
-  state?: string;          // PRD：状态矩阵输出（S11~S23）
-  templateId?: string;     // PRD：选中的模板ID
+export type RunRecord = { id: string; createdAt: Date };
+
+export type RunPayload = {
+  from: string;
+  gate: string;
+  state: string;
+  templateId: string;
+  runId: string;
+  createdAt: string;
+  input?: any;
+  output?: any;
 };
 
-export async function writeRun(record: Omit<RunRecord, "runId" | "createdAt">): Promise<RunRecord> {
-  // TODO：后续接 Prisma Run 表写入；此处不补全
-  // PRD：最小可运行占位实现：生成 runId + 时间戳，返回结构供上层链路继续
-  const now = new Date().toISOString();
-  const runId = `run_${Date.now()}`;
+// 兼容模式：
+// A) writeRun(prisma, payload)  —— 新主线（推荐）
+// B) writeRun({ gate, state, templateId, ... }) —— 旧代码兼容（内部自动创建 PrismaClient）
+export async function writeRun(prisma: PrismaClient, payload: RunPayload): Promise<RunRecord>;
+export async function writeRun(payload: Partial<RunPayload> & { gate: string }): Promise<RunRecord>;
+export async function writeRun(
+  a: PrismaClient | (Partial<RunPayload> & { gate: string }),
+  b?: RunPayload
+): Promise<RunRecord> {
+  const isPrisma =
+    typeof (a as any)?.$disconnect === "function" &&
+    typeof (a as any)?.$connect === "function";
 
-  return {
-    runId,
-    createdAt: now,
-    gate: record.gate,
-    state: record.state,
-    templateId: record.templateId,
-  };
+  // ---------- 新用法：writeRun(prisma, payload) ----------
+  if (isPrisma) {
+    const prisma = a as PrismaClient;
+    const payload = b as RunPayload;
+
+    const created = await prisma.run.create({
+      data: {
+        inputJson: JSON.stringify({
+          from: payload.from,
+          gate: payload.gate,
+          state: payload.state,
+          templateId: payload.templateId,
+          runId: payload.runId,
+          createdAt: payload.createdAt,
+          input: payload.input ?? null,
+        }),
+        outputJson: JSON.stringify({
+          ok: true,
+          gate: payload.gate,
+          state: payload.state,
+          output: payload.output ?? null,
+        }),
+      },
+      select: { id: true, createdAt: true },
+    });
+
+    return created;
+  }
+
+  // ---------- 旧用法：writeRun({gate,...})：内部自建 PrismaClient ----------
+  const partial = a as Partial<RunPayload> & { gate: string };
+
+  const prisma = new PrismaClient();
+  try {
+    const nowIso = new Date().toISOString();
+    const payload: RunPayload = {
+      from: partial.from ?? "judge",
+      gate: partial.gate,
+      state: partial.state ?? "NA",
+      templateId: partial.templateId ?? "NA",
+      runId: partial.runId ?? `run_${Date.now()}`,
+      createdAt: partial.createdAt ?? nowIso,
+      input: partial.input ?? null,
+      output: partial.output ?? null,
+    };
+
+    const created = await prisma.run.create({
+      data: {
+        inputJson: JSON.stringify({
+          from: payload.from,
+          gate: payload.gate,
+          state: payload.state,
+          templateId: payload.templateId,
+          runId: payload.runId,
+          createdAt: payload.createdAt,
+          input: payload.input ?? null,
+        }),
+        outputJson: JSON.stringify({
+          ok: true,
+          gate: payload.gate,
+          state: payload.state,
+          output: payload.output ?? null,
+        }),
+      },
+      select: { id: true, createdAt: true },
+    });
+
+    return created;
+  } finally {
+    await prisma.$disconnect();
+  }
 }
