@@ -1,0 +1,23 @@
+﻿{
+  "name": "semo-kids",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist src/server.ts src/routes/emotion.ts src/emotion/judge.ts src/emotion/_smokeJudge.ts",
+    "start": "node dist/server.js",
+    "test:smoke": "node dist/_smokeJudge.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
