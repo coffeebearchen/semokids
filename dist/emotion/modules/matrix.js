@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolveState = resolveState;
 function resolveState(signals) {
     // TODO：状态矩阵规则待按冻结 PRD 映射；此处不补全
-    switch (signals === null || signals === void 0 ? void 0 : signals.level) {
+    switch (signals?.level) {
         case 1:
             return "S11";
         case 2:

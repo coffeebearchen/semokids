@@ -12,3 +12,20 @@ dev.db
 # 明确：模板 bundle 必须被版本控制
 !src/templates/
 !src/templates/**
+
+# ---- local env ----
+.env
+
+# ---- build output ----
+
+# ---- local sqlite ----
+*.db
+
+# ---- node ----
+
+# npm internal lock (ignore)
+node_modules/.package-lock.json
+
+
+tools/manual-insert-run.js
+

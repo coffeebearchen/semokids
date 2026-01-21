@@ -3,27 +3,24 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --module commonjs --verbatimModuleSyntax false --outDir dist src/server.ts src/routes/emotion.ts src/emotion/judge.ts src/emotion/_smokeJudge.ts",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test:smoke": "node -r dotenv/config dist/_smokeJudge.js"
+    "test:smoke": "node -r dotenv/config dist/emotion/_smokeJudge.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@libsql/client": "^0.17.0",
-    "@prisma/adapter-libsql": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "6.19.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
-    "@prisma/config": "^7.2.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.9",
-    "dotenv": "^17.2.3",
-    "prisma": "^7.2.0",
+    "dotenv": "17.2.3",
+    "prisma": "6.19.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "5.9.3"
   }
 }
