@@ -1,0 +1,14 @@
+﻿# SEMO-Kids V1.0｜项目级忽略（防漂移）
+node_modules/
+dist/
+.dev.db
+dev.db
+*.log
+
+# 明确：src 必须被版本控制（防止全局忽略误伤）
+!src/
+!src/**
+
+# 明确：模板 bundle 必须被版本控制
+!src/templates/
+!src/templates/**
